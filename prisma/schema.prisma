@@ -1,0 +1,107 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Hospital {
+  id                String         @id @default(uuid())
+  clerkUserId       String         @unique
+  name              String
+  address           String
+  latitude          Float
+  longitude         Float
+  phone             String
+  phoneCountryCode  String?        // e.g., "+1" for USA
+  countryLocation   String?        // e.g., "United States"
+  email             String
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  bloodRequests     BloodRequest[]
+  donationCamps     DonationCamp[]
+  affiliatedDonors  Donor[]
+}
+
+model Donor {
+  id                   String                  @id @default(uuid())
+  clerkUserId          String                  @unique
+  firstName            String
+  lastName             String
+  bloodType            String
+  phone                String
+  phoneCountryCode     String?                 // e.g., "+1" for USA
+  countryLocation      String?                 // e.g., "United States"
+  email                String
+  address              String?
+  latitude             Float?
+  longitude            Float?
+  hospitalAffiliation  Hospital?               @relation(fields: [hospitalAffiliationId], references: [id], onDelete: SetNull)
+  hospitalAffiliationId String?
+  isAvailable          Boolean                 @default(true)
+  lastDonationDate     DateTime?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  campRSVPs            CampRSVP[]
+  contributions        BloodDonorContribution[]
+}
+
+model BloodRequest {
+  id              String                      @id @default(uuid())
+  hospitalId      String
+  bloodType       String
+  unitsNeeded     Int
+  unitsFulfilled  Int                         @default(0)
+  urgency         String
+  status          String                      @default("OPEN")
+  notes           String?
+  createdAt       DateTime                    @default(now())
+  updatedAt       DateTime                    @updatedAt
+  hospital        Hospital                    @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  contributions   BloodDonorContribution[]
+}
+
+model BloodDonorContribution {
+  id                String      @id @default(uuid())
+  requestId         String
+  donorId           String
+  unitsContributed  Int
+  createdAt         DateTime    @default(now())
+  request           BloodRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  donor             Donor       @relation(fields: [donorId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, donorId])
+}
+
+model DonationCamp {
+  id          String     @id @default(uuid())
+  hospitalId  String
+  title       String
+  description String?
+  address     String
+  latitude    Float?
+  longitude   Float?
+  startDate   DateTime
+  endDate     DateTime
+  maxCapacity Int
+  collectedUnits Int @default(0)
+  status      String     @default("UPCOMING")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  hospital    Hospital   @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  rsvps       CampRSVP[]
+}
+
+model CampRSVP {
+  id        String       @id @default(uuid())
+  campId    String
+  donorId   String
+  status    String       @default("CONFIRMED")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  camp      DonationCamp @relation(fields: [campId], references: [id], onDelete: Cascade)
+  donor     Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade)
+
+  @@unique([campId, donorId])
+}
