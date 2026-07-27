@@ -19,6 +19,14 @@ export async function cleanupOldCompletedData() {
     },
   });
 
+  await db.donationCamp.updateMany({
+    where: {
+      endDate: { lt: new Date() },
+      status: { not: "COMPLETED" },
+    },
+    data: { status: "COMPLETED" },
+  });
+
   return {
     deletedRequests: deletedRequests.count,
     deletedCamps: deletedCamps.count,
