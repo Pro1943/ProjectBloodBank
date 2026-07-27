@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/app-shell";
 import { StatCard } from "@/components/ui/stat-card";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
+import { syncCampStatuses } from "@/lib/maintenance";
 import { db } from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
@@ -11,6 +12,8 @@ export default async function HospitalDashboardPage() {
 
   const hospital = await db.hospital.findUnique({ where: { clerkUserId: user.id } });
   if (!hospital) return null;
+
+  await syncCampStatuses();
 
   const [requestCount, campCount, donorCount, criticalCount] = await Promise.all([
     db.bloodRequest.count({ where: { hospitalId: hospital.id, status: { in: ["OPEN", "PARTIALLY_FILLED"] } } }),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/ui/page-header";
@@ -8,6 +8,7 @@ import { CampCard } from "@/components/ui/camp-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { FormField, inputClass, selectClass } from "@/components/ui/form-field";
+import { getEffectiveCampStatus } from "@/lib/camp-status";
 
 type Camp = {
   id: string;
@@ -25,6 +26,7 @@ type Camp = {
 export default function HospitalCampsPage() {
   const [camps, setCamps] = useState<Camp[]>([]);
   const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(() => new Date());
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [editingCampId, setEditingCampId] = useState<string | null>(null);
@@ -38,15 +40,18 @@ export default function HospitalCampsPage() {
     startDate: "", endDate: "", maxCapacity: "",
   });
 
-  useEffect(() => {
-    fetch("/api/camps", { credentials: "include" })
+  const loadCamps = useCallback(() => {
+    return fetch("/api/camps", { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data)) {
           setCamps(data);
         }
-      })
-      .finally(() => setLoading(false));
+      });
+  }, []);
+
+  useEffect(() => {
+    loadCamps().finally(() => setLoading(false));
 
     fetch("/api/hospital/donors", { credentials: "include" })
       .then((r) => r.json())
@@ -59,7 +64,16 @@ export default function HospitalCampsPage() {
           }
         }
       });
-  }, []);
+  }, [loadCamps]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date());
+      void loadCamps();
+    }, 30_000);
+
+    return () => clearInterval(interval);
+  }, [loadCamps]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,9 +100,9 @@ export default function HospitalCampsPage() {
     }
   };
 
-  const now = new Date();
-  const upcomingCamps = camps.filter((camp) => new Date(camp.endDate) >= now);
-  const pastCamps = camps.filter((camp) => new Date(camp.endDate) < now);
+  const nowTime = now.getTime();
+  const upcomingCamps = camps.filter((camp) => new Date(camp.endDate).getTime() >= nowTime);
+  const pastCamps = camps.filter((camp) => new Date(camp.endDate).getTime() < nowTime);
 
   const handleSaveCollected = async (campId: string) => {
     setSavingCollected((prev) => [...prev, campId]);
@@ -230,7 +244,10 @@ export default function HospitalCampsPage() {
               <EmptyState title="No upcoming camps" description="Schedule a new blood drive to get started." />
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
-                {upcomingCamps.map((camp, i) => (
+                {upcomingCamps.map((camp, i) => {
+                  const { status, isPast } = getEffectiveCampStatus(camp.startDate, camp.endDate, camp.status, now);
+
+                  return (
                   <CampCard
                     key={camp.id}
                     title={camp.title}
@@ -241,7 +258,8 @@ export default function HospitalCampsPage() {
                     maxCapacity={camp.maxCapacity}
                     rsvpCount={camp.rsvpCount}
                     collectedUnits={camp.collectedUnits}
-                    status={camp.status}
+                    status={status}
+                    isPast={isPast}
                     index={i}
                     action={
                       <div className="space-y-3">
@@ -301,7 +319,8 @@ export default function HospitalCampsPage() {
                       </div>
                     }
                   />
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>
@@ -318,7 +337,10 @@ export default function HospitalCampsPage() {
               <EmptyState title="No past camps yet" description="Past camps will appear here after they end." />
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
-                {pastCamps.map((camp, i) => (
+                {pastCamps.map((camp, i) => {
+                  const { status } = getEffectiveCampStatus(camp.startDate, camp.endDate, camp.status, now);
+
+                  return (
                   <CampCard
                     key={camp.id}
                     title={camp.title}
@@ -329,7 +351,7 @@ export default function HospitalCampsPage() {
                     maxCapacity={camp.maxCapacity}
                     rsvpCount={camp.rsvpCount}
                     collectedUnits={camp.collectedUnits}
-                    status={camp.status}
+                    status={status}
                     isPast
                     index={i}
                     action={
@@ -367,7 +389,8 @@ export default function HospitalCampsPage() {
                       </div>
                     }
                   />
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>

@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/ui/page-header";
 import { CampCard } from "@/components/ui/camp-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
+import { getEffectiveCampStatus } from "@/lib/camp-status";
 
 type Camp = {
   id: string;
@@ -24,18 +25,31 @@ type Camp = {
 export default function DonorCampsPage() {
   const [camps, setCamps] = useState<Camp[]>([]);
   const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(() => new Date());
   const [registering, setRegistering] = useState<string[]>([]);
 
-  useEffect(() => {
-    fetch("/api/camps")
+  const loadCamps = useCallback(() => {
+    return fetch("/api/camps")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
           setCamps(data);
         }
-      })
-      .finally(() => setLoading(false));
+      });
   }, []);
+
+  useEffect(() => {
+    loadCamps().finally(() => setLoading(false));
+  }, [loadCamps]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date());
+      void loadCamps();
+    }, 30_000);
+
+    return () => clearInterval(interval);
+  }, [loadCamps]);
 
   const handleRegister = async (campId: string) => {
     setRegistering((prev) => [...prev, campId]);
@@ -85,6 +99,7 @@ export default function DonorCampsPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           {camps.map((camp, i) => {
             const isRegistered = camp.isRegistered ?? false;
+            const { status } = getEffectiveCampStatus(camp.startDate, camp.endDate, camp.status, now);
 
             return (
               <CampCard
@@ -97,7 +112,7 @@ export default function DonorCampsPage() {
                 maxCapacity={camp.maxCapacity}
                 rsvpCount={camp.rsvpCount}
                 collectedUnits={camp.collectedUnits}
-                status={camp.status}
+                status={status}
                 index={i}
                 action={
                   isRegistered ? (

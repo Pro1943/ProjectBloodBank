@@ -43,7 +43,10 @@ export function CampCard({
   const barWidth = Math.min(rawPct, 100);
   const goalReached = collected >= maxCapacity && maxCapacity > 0;
   const progressColor = goalReached ? "bg-[#16A34A]" : "bg-[#0369A1]";
-  const statusCfg = isPast ? { label: "Finished", classes: "bg-slate-100 text-[#64748B]" } : statusConfig[status] ?? statusConfig.UPCOMING;
+  const statusCfg =
+    isPast || status === "COMPLETED"
+      ? { label: "Finished", classes: "bg-slate-100 text-[#64748B]" }
+      : statusConfig[status] ?? statusConfig.UPCOMING;
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });

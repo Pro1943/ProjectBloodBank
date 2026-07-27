@@ -2,6 +2,7 @@ import { AppShell } from "@/components/app-shell";
 import { StatCard } from "@/components/ui/stat-card";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { CooldownIndicator } from "@/components/ui/cooldown-indicator";
+import { syncCampStatuses } from "@/lib/maintenance";
 import { db } from "@/lib/db";
 import { checkBloodCompatibility } from "@/lib/blood-compatibility";
 import { calculateDistance } from "@/lib/distance";
@@ -18,6 +19,8 @@ export default async function DonorDashboardPage() {
     where: { clerkUserId: user.id },
     include: { campRSVPs: true, hospitalAffiliation: true },
   });
+
+  await syncCampStatuses();
 
   const requests = await db.bloodRequest.findMany({
     where: { status: { in: ["OPEN", "PARTIALLY_FILLED"] } },

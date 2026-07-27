@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { cleanupOldCompletedData } from "@/lib/maintenance";
+import { syncCampStatuses } from "@/lib/maintenance";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
@@ -23,7 +23,7 @@ type CampItem = {
 
 export async function GET(request: Request) {
   try {
-    await cleanupOldCompletedData();
+    await syncCampStatuses();
 
     const user = await currentUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
