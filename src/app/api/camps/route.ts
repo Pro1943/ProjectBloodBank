@@ -3,6 +3,24 @@ import { cleanupOldCompletedData } from "@/lib/maintenance";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+type CampItem = {
+  id: string;
+  hospitalId: string;
+  title: string;
+  description?: string | null;
+  address: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  startDate: Date;
+  endDate: Date;
+  maxCapacity: number;
+  collectedUnits?: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  rsvps: { status: string }[];
+};
+
 export async function GET(request: Request) {
   try {
     await cleanupOldCompletedData();
@@ -19,10 +37,10 @@ export async function GET(request: Request) {
         where: { hospitalId: hospital.id },
         orderBy: { startDate: "asc" },
         include: { rsvps: { where: { status: "CONFIRMED" } } },
-      });
+      }) as unknown as CampItem[];
 
       return NextResponse.json(
-        camps.map((camp) => ({
+        camps.map((camp: CampItem) => ({
           ...camp,
           rsvpCount: camp.rsvps.length,
         }))
@@ -47,20 +65,20 @@ export async function GET(request: Request) {
       },
       orderBy: { startDate: "asc" },
       include: { rsvps: { where: { status: "CONFIRMED" } } },
-    });
+    }) as unknown as CampItem[];
 
     const registered = await db.campRSVP.findMany({
       where: {
         donorId: donor.id,
-        campId: { in: camps.map((camp) => camp.id) },
+        campId: { in: camps.map((camp: CampItem) => camp.id) },
       },
       select: { campId: true },
     });
 
-    const registeredCampIds = new Set(registered.map((item) => item.campId));
+    const registeredCampIds = new Set(registered.map((item: { campId: string }) => item.campId));
 
     return NextResponse.json(
-      camps.map((camp) => ({
+      camps.map((camp: CampItem) => ({
         ...camp,
         rsvpCount: camp.rsvps.length,
         isRegistered: registeredCampIds.has(camp.id),
