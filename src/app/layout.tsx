@@ -6,8 +6,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "VitalLink Blood Coordination",
-  description: "A coordinated blood donation platform for hospitals and donors.",
+  title: "Project BloodBank — Emergency Blood Coordination",
+  description: "A purpose-built workspace for hospitals to coordinate emergency blood needs and donors to save lives.",
 };
 
 export default function RootLayout({
