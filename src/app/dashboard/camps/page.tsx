@@ -193,7 +193,7 @@ export default function HospitalCampsPage() {
                   <input required type="datetime-local" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} className={inputClass} />
                 </FormField>
               </div>
-              <FormField label="Max blood collection capacity">
+              <FormField label="Minimum blood collection target (1 unit = 450ml)">
                 <input required type="number" min="1" value={formData.maxCapacity} onChange={(e) => setFormData({ ...formData, maxCapacity: e.target.value })} className={inputClass} placeholder="e.g. 50" />
               </FormField>
               <motion.button
