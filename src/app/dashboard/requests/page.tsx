@@ -25,7 +25,8 @@ type Donor = {
   firstName: string;
   lastName: string;
   bloodType: string;
-  canDonate: boolean;
+  isAvailable?: boolean;
+  canDonate?: boolean;
 };
 
 type Contribution = {
