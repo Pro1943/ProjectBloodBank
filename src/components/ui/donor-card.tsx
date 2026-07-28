@@ -11,21 +11,18 @@ type DonorCardProps = {
   address?: string | null;
   isAvailable: boolean;
   lastDonationDate: string | null;
-  isUpdating?: boolean;
-  onToggleAvailability?: (id: string, current: boolean) => void;
+  distanceKm?: number;
   index?: number;
 };
 
 export function DonorCard({
-  id,
   firstName,
   lastName,
   bloodType,
   address,
   isAvailable,
   lastDonationDate,
-  isUpdating,
-  onToggleAvailability,
+  distanceKm,
   index = 0,
 }: DonorCardProps) {
   const lastDonationLabel = lastDonationDate
@@ -49,6 +46,9 @@ export function DonorCard({
             <p className="font-semibold text-[#0F172A]">{firstName} {lastName}</p>
             <p className="text-xs text-[#64748B]">{address ?? "Address not provided"}</p>
             <p className="mt-0.5 text-xs text-[#94A3B8]">Last donation: {lastDonationLabel}</p>
+            {distanceKm !== undefined && (
+              <p className="mt-0.5 text-xs text-[#94A3B8]">{distanceKm.toFixed(1)} km away</p>
+            )}
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
@@ -59,18 +59,6 @@ export function DonorCard({
         </div>
       </div>
 
-      {onToggleAvailability && (
-        <div className="mt-4 flex justify-end">
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            disabled={isUpdating}
-            onClick={() => onToggleAvailability(id, isAvailable)}
-            className="rounded-lg border border-[#E2E8F0] px-4 py-1.5 text-sm font-semibold text-[#0369A1] transition-colors hover:bg-[#E0F2FE] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isUpdating ? "Updating…" : isAvailable ? "Pause donor" : "Mark available"}
-          </motion.button>
-        </div>
-      )}
     </motion.div>
   );
 }

@@ -28,6 +28,10 @@ export default function HospitalOnboardingPage() {
       setError(phoneValidation.error || "Invalid phone number");
       return;
     }
+    if (!formData.latitude || !formData.longitude || !Number.isFinite(Number(formData.latitude)) || !Number.isFinite(Number(formData.longitude))) {
+      setError("Latitude and longitude are required.");
+      return;
+    }
 
     setLoading(true);
     try {

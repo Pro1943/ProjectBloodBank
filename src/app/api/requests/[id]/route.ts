@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const req = await db.bloodRequest.findUnique({ where: { id }, include: { hospital: { select: { id: true, name: true, phone: true, phoneCountryCode: true, email: true } } } });
@@ -32,7 +32,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: "Forbidden: only the requesting hospital can update this request" }, { status: 403 });
     }
 
-    const allowedFields: any = {};
+    const allowedFields: {
+      status?: string;
+      notes?: string;
+      unitsNeeded?: number;
+    } = {};
     if (body.status !== undefined) allowedFields.status = body.status;
     if (body.notes !== undefined) allowedFields.notes = body.notes;
     if (body.unitsNeeded !== undefined) allowedFields.unitsNeeded = parseInt(body.unitsNeeded, 10);

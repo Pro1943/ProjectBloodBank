@@ -35,11 +35,12 @@ model Donor {
   countryLocation      String?                 // e.g., "United States"
   email                String
   address              String?
-  latitude             Float?
-  longitude            Float?
+  latitude             Float
+  longitude            Float
   hospitalAffiliation  Hospital?               @relation(fields: [hospitalAffiliationId], references: [id], onDelete: SetNull)
   hospitalAffiliationId String?
   isAvailable          Boolean                 @default(true)
+  isAvailabilityOptedIn Boolean                @default(true)
   lastDonationDate     DateTime?
   createdAt            DateTime                @default(now())
   updatedAt            DateTime                @updatedAt

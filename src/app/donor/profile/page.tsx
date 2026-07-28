@@ -21,9 +21,11 @@ type Donor = {
   phoneCountryCode: string;
   countryLocation: string;
   address: string | null;
-  latitude: number | null;
-  longitude: number | null;
+  latitude: number;
+  longitude: number;
   hospitalAffiliationId: string | null;
+  isAvailabilityOptedIn: boolean;
+  isBaseEligible: boolean;
 };
 
 type Hospital = { id: string; name: string };
@@ -72,6 +74,10 @@ export default function DonorProfilePage() {
     if (formData.phone) {
       const result = validatePhoneNumberByCode(formData.phone, formData.phoneCountryCode);
       if (!result.valid) { setPhoneError(result.error || "Invalid phone number"); return; }
+    }
+    if (!Number.isFinite(formData.latitude) || !Number.isFinite(formData.longitude)) {
+      setError("Latitude and longitude are required.");
+      return;
     }
     setSaving(true);
     setError(""); setSuccess("");
@@ -138,13 +144,36 @@ export default function DonorProfilePage() {
             <input type="text" value={formData.address ?? ""} onChange={(e) => setFormData({ ...formData, address: e.target.value || null })} className={inputClass} placeholder="Your address" />
           </FormField>
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Latitude (optional)" hint="Used to find nearby requests">
-              <input type="number" step="0.0001" value={formData.latitude ?? ""} onChange={(e) => setFormData({ ...formData, latitude: e.target.value ? parseFloat(e.target.value) : null })} className={inputClass} placeholder="e.g. 28.6139" />
+            <FormField label="Latitude" hint="Used to find nearby requests">
+              <input required type="number" step="0.0001" value={Number.isFinite(formData.latitude) ? formData.latitude : ""} onChange={(e) => setFormData({ ...formData, latitude: e.target.value ? parseFloat(e.target.value) : Number.NaN })} className={inputClass} placeholder="e.g. 28.6139" />
             </FormField>
-            <FormField label="Longitude (optional)">
-              <input type="number" step="0.0001" value={formData.longitude ?? ""} onChange={(e) => setFormData({ ...formData, longitude: e.target.value ? parseFloat(e.target.value) : null })} className={inputClass} placeholder="e.g. 77.2090" />
+            <FormField label="Longitude" hint="Used to find nearby requests">
+              <input required type="number" step="0.0001" value={Number.isFinite(formData.longitude) ? formData.longitude : ""} onChange={(e) => setFormData({ ...formData, longitude: e.target.value ? parseFloat(e.target.value) : Number.NaN })} className={inputClass} placeholder="e.g. 77.2090" />
             </FormField>
           </div>
+        </div>
+
+        <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 shadow-sm space-y-3">
+          <h2 className="font-semibold text-[#0F172A]">Availability</h2>
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={formData.isAvailabilityOptedIn}
+              disabled={!formData.isBaseEligible}
+              onChange={(e) => setFormData({ ...formData, isAvailabilityOptedIn: e.target.checked })}
+              className="mt-0.5 h-4 w-4 rounded border-[#CBD5E1] text-[#0369A1] disabled:opacity-50"
+            />
+            <div>
+              <p className="text-sm font-medium text-[#0F172A]">
+                {formData.isBaseEligible ? "Available for matching" : "Donation cooldown active"}
+              </p>
+              <p className="text-xs text-[#64748B]">
+                {formData.isBaseEligible
+                  ? "Turn this off when you are eligible but temporarily unavailable."
+                  : "You cannot opt in again until the 56-day cooldown has passed."}
+              </p>
+            </div>
+          </label>
         </div>
 
         <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 shadow-sm space-y-4">
@@ -175,7 +204,7 @@ export default function DonorProfilePage() {
               </button>
             )}
           </div>
-          <p className="text-xs text-[#64748B]">Affiliating with a hospital allows their team to assign you to blood requests.</p>
+          <p className="text-xs text-[#64748B]">Affiliating with a hospital helps their team find you in nearby donor matching.</p>
           <select value={formData.hospitalAffiliationId ?? ""} onChange={(e) => setFormData({ ...formData, hospitalAffiliationId: e.target.value || null })} className={selectClass}>
             <option value="">Not affiliated</option>
             {hospitals.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}

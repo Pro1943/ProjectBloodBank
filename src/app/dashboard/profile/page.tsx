@@ -13,8 +13,8 @@ type Hospital = {
   id: string;
   name: string;
   address: string;
-  latitude: number | null;
-  longitude: number | null;
+  latitude: number;
+  longitude: number;
   phone: string;
   phoneCountryCode: string;
   countryLocation: string;
@@ -53,6 +53,10 @@ export default function HospitalProfilePage() {
     if (formData.phone) {
       const result = validatePhoneNumberByCode(formData.phone, formData.phoneCountryCode);
       if (!result.valid) { setPhoneError(result.error || "Invalid phone number"); return; }
+    }
+    if (!Number.isFinite(formData.latitude) || !Number.isFinite(formData.longitude)) {
+      setError("Latitude and longitude are required.");
+      return;
     }
     setSaving(true);
     setError(""); setSuccess("");
@@ -111,11 +115,11 @@ export default function HospitalProfilePage() {
             <input type="text" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className={inputClass} />
           </FormField>
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Latitude (optional)">
-              <input type="number" step="0.0001" value={formData.latitude ?? ""} onChange={(e) => setFormData({ ...formData, latitude: e.target.value ? parseFloat(e.target.value) : null })} className={inputClass} placeholder="e.g. 28.6139" />
+            <FormField label="Latitude">
+              <input required type="number" step="0.0001" value={Number.isFinite(formData.latitude) ? formData.latitude : ""} onChange={(e) => setFormData({ ...formData, latitude: e.target.value ? parseFloat(e.target.value) : Number.NaN })} className={inputClass} placeholder="e.g. 28.6139" />
             </FormField>
-            <FormField label="Longitude (optional)">
-              <input type="number" step="0.0001" value={formData.longitude ?? ""} onChange={(e) => setFormData({ ...formData, longitude: e.target.value ? parseFloat(e.target.value) : null })} className={inputClass} placeholder="e.g. 77.2090" />
+            <FormField label="Longitude">
+              <input required type="number" step="0.0001" value={Number.isFinite(formData.longitude) ? formData.longitude : ""} onChange={(e) => setFormData({ ...formData, longitude: e.target.value ? parseFloat(e.target.value) : Number.NaN })} className={inputClass} placeholder="e.g. 77.2090" />
             </FormField>
           </div>
         </div>

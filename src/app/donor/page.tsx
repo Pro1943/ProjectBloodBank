@@ -3,13 +3,12 @@ import { StatCard } from "@/components/ui/stat-card";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { CooldownIndicator } from "@/components/ui/cooldown-indicator";
 import { syncCampStatuses } from "@/lib/maintenance";
+import { getDonorAvailability } from "@/lib/availability";
 import { db } from "@/lib/db";
 import { checkBloodCompatibility } from "@/lib/blood-compatibility";
 import { calculateDistance } from "@/lib/distance";
 import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
-
-const COOLDOWN_DAYS = 90;
 
 export default async function DonorDashboardPage() {
   const user = await currentUser();
@@ -63,17 +62,9 @@ export default async function DonorDashboardPage() {
     },
   });
 
-  let daysSinceDonation: number | null = null;
-  let inCooldown = false;
-
-  if (donor?.lastDonationDate) {
-    daysSinceDonation = Math.floor(
-      (now.getTime() - new Date(donor.lastDonationDate).getTime()) / (1000 * 60 * 60 * 24)
-    );
-    inCooldown = daysSinceDonation < COOLDOWN_DAYS;
-  }
-
-  const canDonate = (donor?.isAvailable ?? true) && !inCooldown;
+  const availability = donor
+    ? getDonorAvailability(donor, now)
+    : { daysSinceDonation: null, isBaseEligible: true, isAvailable: true };
 
   const lastDonationLabel = donor?.lastDonationDate
     ? new Date(donor.lastDonationDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
@@ -97,8 +88,9 @@ export default async function DonorDashboardPage() {
       </div>
 
       <CooldownIndicator
-        canDonate={canDonate}
-        daysSinceDonation={daysSinceDonation}
+        canDonate={availability.isAvailable}
+        daysSinceDonation={availability.daysSinceDonation}
+        isBaseEligible={availability.isBaseEligible}
         lastDonationLabel={lastDonationLabel}
       />
 

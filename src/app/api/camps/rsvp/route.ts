@@ -30,29 +30,11 @@ export async function POST(request: NextRequest) {
     }
 
     const donor = await db.donor.findUnique({ where: { clerkUserId: user.id } });
-    const hospital = await db.hospital.findUnique({ where: { clerkUserId: user.id } });
-
-    let donorId: string | null = null;
-
-    if (donor) {
-      donorId = donor.id;
-    } else if (hospital) {
-      if (!body.donorId) {
-        return NextResponse.json({ error: "Donor ID is required when adding a donor as a hospital" }, { status: 400 });
-      }
-      const affiliatedDonor = await db.donor.findFirst({
-        where: {
-          id: body.donorId,
-          hospitalAffiliationId: hospital.id,
-        },
-      });
-      if (!affiliatedDonor) {
-        return NextResponse.json({ error: "Donor not found or not affiliated with this hospital" }, { status: 404 });
-      }
-      donorId = affiliatedDonor.id;
-    } else {
-      return NextResponse.json({ error: "Only donors or hospital users can register donors for camps" }, { status: 403 });
+    if (!donor) {
+      return NextResponse.json({ error: "Only donors can register themselves for camps" }, { status: 403 });
     }
+
+    const donorId = donor.id;
 
     const existingRsvp = await db.campRSVP.findUnique({
       where: {

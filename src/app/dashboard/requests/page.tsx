@@ -38,17 +38,6 @@ type Contribution = {
 
 const BLOOD_TYPES = ["O_NEG", "O_POS", "A_NEG", "A_POS", "B_NEG", "B_POS", "AB_NEG", "AB_POS"];
 
-const COMPATIBLE_MAP: Record<string, string[]> = {
-  O_NEG: ["O_NEG", "O_POS", "A_NEG", "A_POS", "B_NEG", "B_POS", "AB_NEG", "AB_POS"],
-  O_POS: ["O_POS", "A_POS", "B_POS", "AB_POS"],
-  A_NEG: ["A_NEG", "A_POS", "AB_NEG", "AB_POS"],
-  A_POS: ["A_POS", "AB_POS"],
-  B_NEG: ["B_NEG", "B_POS", "AB_NEG", "AB_POS"],
-  B_POS: ["B_POS", "AB_POS"],
-  AB_NEG: ["AB_NEG", "AB_POS"],
-  AB_POS: ["AB_POS"],
-};
-
 export default function HospitalRequestsPage() {
   const [requests, setRequests] = useState<BloodRequest[]>([]);
   const [donors, setDonors] = useState<Donor[]>([]);
@@ -281,7 +270,7 @@ export default function HospitalRequestsPage() {
                       </p>
                       {compatibleDonors.length === 0 ? (
                         <p className="rounded-lg bg-red-50 p-3 text-sm text-[#B91C1C]">
-                          No eligible donors with compatible blood type. Donors may be in the 90-day donation cooldown.
+                          No eligible donors with compatible blood type within 50 km. Donors may be in the 56-day donation cooldown or opted out.
                         </p>
                       ) : (
                         <form onSubmit={(e) => handleAddContribution(request.id, e)} className="flex flex-wrap gap-2 items-end">

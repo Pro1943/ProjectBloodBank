@@ -6,11 +6,12 @@ type CooldownIndicatorProps = {
   canDonate: boolean;
   daysSinceDonation: number | null;
   lastDonationLabel: string;
+  isBaseEligible?: boolean;
 };
 
-const COOLDOWN_DAYS = 90;
+const COOLDOWN_DAYS = 56;
 
-export function CooldownIndicator({ canDonate, daysSinceDonation, lastDonationLabel }: CooldownIndicatorProps) {
+export function CooldownIndicator({ canDonate, daysSinceDonation, lastDonationLabel, isBaseEligible = canDonate }: CooldownIndicatorProps) {
   const progress = daysSinceDonation !== null
     ? Math.min(daysSinceDonation / COOLDOWN_DAYS, 1)
     : 1;
@@ -51,12 +52,17 @@ export function CooldownIndicator({ canDonate, daysSinceDonation, lastDonationLa
         </div>
         <div>
           <p className={`text-sm font-semibold ${canDonate ? "text-[#0D9488]" : "text-[#B45309]"}`}>
-            {canDonate ? "Ready to donate" : "Donation cooldown active"}
+            {canDonate ? "Ready to donate" : isBaseEligible ? "Temporarily unavailable" : "Donation cooldown active"}
           </p>
           <p className="mt-1 text-sm text-[#64748B]">Last donation: {lastDonationLabel}</p>
-          {!canDonate && daysSinceDonation !== null && (
+          {!canDonate && !isBaseEligible && daysSinceDonation !== null && (
             <p className="mt-1 text-sm font-medium text-[#0F172A]">
               {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} remaining
+            </p>
+          )}
+          {!canDonate && isBaseEligible && (
+            <p className="mt-1 text-sm font-medium text-[#0F172A]">
+              You opted out of matching for now.
             </p>
           )}
         </div>

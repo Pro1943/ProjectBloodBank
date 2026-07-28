@@ -7,7 +7,6 @@ import { RequestCard } from "@/components/ui/request-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { Modal } from "@/components/ui/modal";
-import { checkBloodCompatibility } from "@/lib/blood-compatibility";
 
 type BloodRequest = {
   id: string;
@@ -24,23 +23,19 @@ type BloodRequest = {
 type ContactInfo = { hospitalName: string; email: string; phone: string } | null;
 
 export default function DonorRequestsPage() {
-  const [requests, setRequests] = useState<BloodRequest[]>([]);
   const [nearbyRequests, setNearbyRequests] = useState<BloodRequest[]>([]);
   const [donorBloodType, setDonorBloodType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [contactInfo, setContactInfo] = useState<ContactInfo>(null);
-  const [activeTab, setActiveTab] = useState<"compatible" | "nearby">("compatible");
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [donorRes, reqRes, nearbyRes] = await Promise.all([
+        const [donorRes, nearbyRes] = await Promise.all([
           fetch("/api/donors/profile"),
-          fetch("/api/requests"),
           fetch("/api/requests/nearby"),
         ]);
         if (donorRes.ok) setDonorBloodType((await donorRes.json()).bloodType);
-        if (reqRes.ok) setRequests(await reqRes.json());
         if (nearbyRes.ok) setNearbyRequests(await nearbyRes.json());
       } finally {
         setLoading(false);
@@ -49,15 +44,7 @@ export default function DonorRequestsPage() {
     fetchData();
   }, []);
 
-  const compatibleRequests = requests.filter((r) =>
-    donorBloodType ? checkBloodCompatibility(donorBloodType, r.bloodType) : false
-  );
-
-  const compatibleNearby = nearbyRequests.filter((r) =>
-    donorBloodType ? checkBloodCompatibility(donorBloodType, r.bloodType) : false
-  );
-
-  const activeList = activeTab === "compatible" ? compatibleRequests : compatibleNearby;
+  const activeList = nearbyRequests;
 
   return (
     <AppShell role="donor">
@@ -67,27 +54,14 @@ export default function DonorRequestsPage() {
       />
 
       <div className="flex gap-1.5">
-        {(["compatible", "nearby"] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
-              activeTab === tab ? "bg-[#0F172A] text-white" : "border border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1]"
-            }`}
-          >
-            {tab === "compatible" ? "My hospital" : "Nearby hospitals"}
-            {tab === "compatible" && compatibleRequests.length > 0 && (
-              <span className="ml-1.5 rounded-full bg-[#B91C1C] px-1.5 py-px text-xs text-white">
-                {compatibleRequests.length}
-              </span>
-            )}
-            {tab === "nearby" && compatibleNearby.length > 0 && (
-              <span className="ml-1.5 rounded-full bg-[#0369A1] px-1.5 py-px text-xs text-white">
-                {compatibleNearby.length}
-              </span>
-            )}
-          </button>
-        ))}
+        <span className="rounded-full bg-[#0F172A] px-4 py-1.5 text-sm font-semibold text-white">
+          Nearby hospitals
+          {nearbyRequests.length > 0 && (
+            <span className="ml-1.5 rounded-full bg-[#0369A1] px-1.5 py-px text-xs text-white">
+              {nearbyRequests.length}
+            </span>
+          )}
+        </span>
       </div>
 
       {loading ? (
@@ -95,11 +69,7 @@ export default function DonorRequestsPage() {
       ) : activeList.length === 0 ? (
         <EmptyState
           title="No matching requests"
-          description={
-            activeTab === "compatible"
-              ? "No open requests match your blood type at your hospital right now."
-              : "No compatible requests from hospitals within 50 km of your location."
-          }
+          description="No compatible requests from hospitals within 50 km of your location."
         />
       ) : (
         <div className="space-y-3">
@@ -117,7 +87,7 @@ export default function DonorRequestsPage() {
               createdAt={request.createdAt}
               index={i}
               expandedContent={
-                activeTab === "nearby" ? (
+                (
                   <div>
                     <p className="text-sm text-[#64748B] mb-3">{request.hospital.address}</p>
                     <button
@@ -127,9 +97,9 @@ export default function DonorRequestsPage() {
                       Contact hospital →
                     </button>
                   </div>
-                ) : undefined
+                )
               }
-              onExpandToggle={activeTab === "nearby" ? () => {} : undefined}
+              onExpandToggle={() => {}}
             />
           ))}
         </div>

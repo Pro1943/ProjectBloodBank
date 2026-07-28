@@ -1,7 +1,15 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+function parseRequiredCoordinate(value: unknown, label: string): number {
+  const coordinate = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(coordinate)) {
+    throw new Error(`${label} is required`);
+  }
+  return coordinate;
+}
+
+export async function GET() {
   try {
     const hospitals = await db.hospital.findMany({
       select: { id: true, name: true },
@@ -19,6 +27,8 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    const latitude = parseRequiredCoordinate(body.latitude, "Latitude");
+    const longitude = parseRequiredCoordinate(body.longitude, "Longitude");
 
     // Check if hospital already exists with this email
     const existingByEmail = await db.hospital.findFirst({
@@ -49,8 +59,8 @@ export async function POST(request: Request) {
         clerkUserId: body.clerkUserId,
         name: body.name,
         address: body.address,
-        latitude: body.latitude,
-        longitude: body.longitude,
+        latitude,
+        longitude,
         phone: body.phone,
         phoneCountryCode: body.phoneCountryCode,
         countryLocation: body.countryLocation,
@@ -62,8 +72,8 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Hospital creation error:", error);
     return NextResponse.json(
-      { error: "Failed to create hospital" },
-      { status: 500 }
+      { error: error instanceof Error ? error.message : "Failed to create hospital" },
+      { status: error instanceof Error ? 400 : 500 }
     );
   }
 }

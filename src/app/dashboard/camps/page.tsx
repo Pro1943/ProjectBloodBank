@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { CampCard } from "@/components/ui/camp-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
-import { FormField, inputClass, selectClass } from "@/components/ui/form-field";
+import { FormField, inputClass } from "@/components/ui/form-field";
 import { getEffectiveCampStatus } from "@/lib/camp-status";
 
 type Camp = {
@@ -32,9 +32,6 @@ export default function HospitalCampsPage() {
   const [editingCampId, setEditingCampId] = useState<string | null>(null);
   const [collectedValue, setCollectedValue] = useState("");
   const [savingCollected, setSavingCollected] = useState<string[]>([]);
-  const [hospitalDonors, setHospitalDonors] = useState<{ id: string; firstName: string; lastName: string; }[]>([]);
-  const [selectedDonorId, setSelectedDonorId] = useState<string>("");
-  const [registeringDonors, setRegisteringDonors] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     title: "", description: "", address: "", latitude: "", longitude: "",
     startDate: "", endDate: "", maxCapacity: "",
@@ -52,18 +49,6 @@ export default function HospitalCampsPage() {
 
   useEffect(() => {
     loadCamps().finally(() => setLoading(false));
-
-    fetch("/api/hospital/donors", { credentials: "include" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          const availableDonors = data.filter((d: { isAvailable?: boolean }) => d.isAvailable !== false);
-          setHospitalDonors(availableDonors);
-          if (availableDonors.length > 0) {
-            setSelectedDonorId(availableDonors[0].id);
-          }
-        }
-      });
   }, [loadCamps]);
 
   useEffect(() => {
@@ -127,32 +112,6 @@ export default function HospitalCampsPage() {
       alert(err instanceof Error ? err.message : "Unable to save collected units");
     } finally {
       setSavingCollected((prev) => prev.filter((id) => id !== campId));
-    }
-  };
-
-  const handleAddAffiliatedDonor = async (campId: string) => {
-    if (!selectedDonorId) {
-      alert("Select a donor first.");
-      return;
-    }
-
-    setRegisteringDonors((prev) => [...prev, campId]);
-    try {
-      const response = await fetch("/api/camps/rsvp", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ campId, donorId: selectedDonorId }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to add donor to camp");
-
-      setCamps((prev) => prev.map((camp) => (camp.id === campId ? { ...camp, rsvpCount: camp.rsvpCount + 1 } : camp)));
-      alert("Donor added to camp successfully.");
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "Unable to add donor");
-    } finally {
-      setRegisteringDonors((prev) => prev.filter((id) => id !== campId));
     }
   };
 
@@ -294,29 +253,6 @@ export default function HospitalCampsPage() {
                               className="rounded-lg bg-[#0D9488] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#0F766E] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               {savingCollected.includes(camp.id) ? "Saving…" : "Save"}
-                            </button>
-                          </div>
-                        )}
-                        {hospitalDonors.length > 0 && (
-                          <div className="grid gap-2">
-                            <select
-                              value={selectedDonorId}
-                              onChange={(e) => setSelectedDonorId(e.target.value)}
-                              className={selectClass}
-                            >
-                              {hospitalDonors.map((donor) => (
-                                <option key={donor.id} value={donor.id}>
-                                  {donor.firstName} {donor.lastName}
-                                </option>
-                              ))}
-                            </select>
-                            <button
-                              type="button"
-                              disabled={registeringDonors.includes(camp.id)}
-                              onClick={() => handleAddAffiliatedDonor(camp.id)}
-                              className="rounded-lg bg-[#0D9488] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#0F766E] disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              {registeringDonors.includes(camp.id) ? "Adding…" : "Add affiliated donor"}
                             </button>
                           </div>
                         )}

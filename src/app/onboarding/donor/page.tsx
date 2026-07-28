@@ -42,6 +42,10 @@ export default function DonorOnboardingPage() {
       setError(phoneValidation.error || "Invalid phone number");
       return;
     }
+    if (!formData.latitude || !formData.longitude || !Number.isFinite(Number(formData.latitude)) || !Number.isFinite(Number(formData.longitude))) {
+      setError("Latitude and longitude are required.");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -53,8 +57,8 @@ export default function DonorOnboardingPage() {
           lastName: formData.lastName,
           bloodType: formData.bloodType,
           address: formData.address || null,
-          latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-          longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+          latitude: parseFloat(formData.latitude),
+          longitude: parseFloat(formData.longitude),
           phone: formData.phone,
           phoneCountryCode: formData.phoneCountryCode,
           countryLocation: formData.countryLocation,
@@ -120,11 +124,11 @@ export default function DonorOnboardingPage() {
           </FormField>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Latitude (optional)" hint="Helps match nearby requests">
-              <input type="number" step="0.0001" value={formData.latitude} onChange={(e) => setFormData({ ...formData, latitude: e.target.value })} className={inputClass} placeholder="e.g. 23.8103" />
+            <FormField label="Latitude" hint="Helps match nearby requests">
+              <input required type="number" step="0.0001" value={formData.latitude} onChange={(e) => setFormData({ ...formData, latitude: e.target.value })} className={inputClass} placeholder="e.g. 23.8103" />
             </FormField>
-            <FormField label="Longitude (optional)">
-              <input type="number" step="0.0001" value={formData.longitude} onChange={(e) => setFormData({ ...formData, longitude: e.target.value })} className={inputClass} placeholder="e.g. 90.4125" />
+            <FormField label="Longitude">
+              <input required type="number" step="0.0001" value={formData.longitude} onChange={(e) => setFormData({ ...formData, longitude: e.target.value })} className={inputClass} placeholder="e.g. 90.4125" />
             </FormField>
           </div>
 
@@ -153,7 +157,7 @@ export default function DonorOnboardingPage() {
               />
               <div>
                 <p className="text-sm font-medium text-[#0F172A]">Affiliate with a hospital</p>
-                <p className="text-xs text-[#64748B]">Allows hospital staff to assign you to blood requests</p>
+                <p className="text-xs text-[#64748B]">Helps hospital staff find you in nearby donor matching</p>
               </div>
             </label>
             <AnimatePresence>

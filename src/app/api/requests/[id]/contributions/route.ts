@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import { getDonorAvailability } from "@/lib/availability";
+import { checkBloodCompatibility } from "@/lib/blood-compatibility";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -57,6 +59,13 @@ export async function POST(
     }
 
     const unitsContributed = parseInt(body.unitsContributed);
+    if (!Number.isInteger(unitsContributed) || unitsContributed <= 0) {
+      return NextResponse.json(
+        { error: "Units contributed must be a positive number" },
+        { status: 400 }
+      );
+    }
+
     const remainingUnits = bloodRequest.unitsNeeded - bloodRequest.unitsFulfilled;
 
     // Validate that we don't exceed remaining needed units
@@ -65,6 +74,20 @@ export async function POST(
         { error: `Cannot contribute more than ${remainingUnits} remaining units (${remainingUnits * 450} ml)` },
         { status: 400 }
       );
+    }
+
+    const donor = await db.donor.findUnique({ where: { id: body.donorId } });
+    if (!donor) {
+      return NextResponse.json({ error: "Donor not found" }, { status: 404 });
+    }
+
+    if (!checkBloodCompatibility(donor.bloodType, bloodRequest.bloodType)) {
+      return NextResponse.json({ error: "Donor blood type is not compatible with this request" }, { status: 400 });
+    }
+
+    const availability = getDonorAvailability(donor);
+    if (!availability.isAvailable) {
+      return NextResponse.json({ error: "Donor is not currently eligible and opted in for donation" }, { status: 400 });
     }
 
     const existingContribution = await db.bloodDonorContribution.findUnique({
@@ -98,12 +121,11 @@ export async function POST(
           include: { donor: true },
         });
 
-    // Update donor's last donation date and mark as unavailable until cooldown expires
+    // Hospitals can log a witnessed donation event; availability is computed from this date.
     await db.donor.update({
       where: { id: body.donorId },
       data: {
         lastDonationDate: new Date(),
-        isAvailable: false,
       },
     });
 

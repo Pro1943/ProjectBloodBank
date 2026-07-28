@@ -1,8 +1,31 @@
 import { db } from "@/lib/db";
+import { getDonorAvailability } from "@/lib/availability";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+type DonorProfileUpdate = {
+  firstName: string;
+  lastName: string;
+  bloodType: string;
+  phone: string;
+  phoneCountryCode: string;
+  countryLocation: string;
+  address?: string | null;
+  latitude?: number;
+  longitude?: number;
+  hospitalAffiliationId?: string | null;
+  isAvailabilityOptedIn?: boolean;
+};
+
+function parseRequiredCoordinate(value: unknown, label: string): number {
+  const coordinate = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(coordinate)) {
+    throw new Error(`${label} is required`);
+  }
+  return coordinate;
+}
+
+export async function GET() {
   try {
     const user = await currentUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -19,7 +42,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(donor);
+    return NextResponse.json({
+      ...donor,
+      ...getDonorAvailability(donor),
+    });
   } catch (error) {
     console.error("Donor profile fetch error:", error);
     return NextResponse.json(
@@ -36,7 +62,7 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
 
-    const updateData: any = {
+    const updateData: DonorProfileUpdate = {
       firstName: body.firstName,
       lastName: body.lastName,
       bloodType: body.bloodType,
@@ -48,14 +74,13 @@ export async function PUT(request: NextRequest) {
     if (body.address !== undefined) {
       updateData.address = body.address;
     }
-    if (body.latitude !== undefined && body.latitude !== null) {
-      updateData.latitude = parseFloat(body.latitude);
-    }
-    if (body.longitude !== undefined && body.longitude !== null) {
-      updateData.longitude = parseFloat(body.longitude);
-    }
+    updateData.latitude = parseRequiredCoordinate(body.latitude, "Latitude");
+    updateData.longitude = parseRequiredCoordinate(body.longitude, "Longitude");
     if (body.hospitalAffiliationId !== undefined) {
       updateData.hospitalAffiliationId = body.hospitalAffiliationId || null;
+    }
+    if (body.isAvailabilityOptedIn !== undefined) {
+      updateData.isAvailabilityOptedIn = Boolean(body.isAvailabilityOptedIn);
     }
 
     const donor = await db.donor.update({
@@ -64,12 +89,15 @@ export async function PUT(request: NextRequest) {
       include: { hospitalAffiliation: true },
     });
 
-    return NextResponse.json(donor);
+    return NextResponse.json({
+      ...donor,
+      ...getDonorAvailability(donor),
+    });
   } catch (error) {
     console.error("Donor profile update error:", error);
     return NextResponse.json(
-      { error: "Failed to update donor profile" },
-      { status: 500 }
+      { error: error instanceof Error ? error.message : "Failed to update donor profile" },
+      { status: error instanceof Error ? 400 : 500 }
     );
   }
 }

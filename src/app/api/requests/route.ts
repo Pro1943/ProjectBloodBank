@@ -3,7 +3,7 @@ import { cleanupOldCompletedData } from "@/lib/maintenance";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await cleanupOldCompletedData();
 

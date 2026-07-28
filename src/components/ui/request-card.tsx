@@ -41,7 +41,6 @@ const urgencyCardStyles = {
 };
 
 export function RequestCard({
-  id,
   bloodType,
   urgency,
   status,
