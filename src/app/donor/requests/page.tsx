@@ -26,17 +26,24 @@ export default function DonorRequestsPage() {
   const [nearbyRequests, setNearbyRequests] = useState<BloodRequest[]>([]);
   const [donorBloodType, setDonorBloodType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [contactInfo, setContactInfo] = useState<ContactInfo>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
         const [donorRes, nearbyRes] = await Promise.all([
-          fetch("/api/donors/profile"),
-          fetch("/api/requests/nearby"),
+          fetch("/api/donors/profile", { cache: "no-store" }),
+          fetch("/api/requests/nearby", { cache: "no-store" }),
         ]);
         if (donorRes.ok) setDonorBloodType((await donorRes.json()).bloodType);
-        if (nearbyRes.ok) setNearbyRequests(await nearbyRes.json());
+        if (!nearbyRes.ok) {
+          const data = await nearbyRes.json().catch(() => null);
+          throw new Error(data?.error || "Failed to load nearby requests");
+        }
+        setNearbyRequests(await nearbyRes.json());
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load nearby requests");
       } finally {
         setLoading(false);
       }
@@ -64,7 +71,9 @@ export default function DonorRequestsPage() {
         </span>
       </div>
 
-      {loading ? (
+      {error ? (
+        <EmptyState title="Unable to load nearby requests" description={error} />
+      ) : loading ? (
         <LoadingState count={3} />
       ) : activeList.length === 0 ? (
         <EmptyState
