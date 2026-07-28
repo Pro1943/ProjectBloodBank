@@ -10,6 +10,8 @@ type DonorCardProps = {
   bloodType: string;
   address?: string | null;
   isAvailable: boolean;
+  isBaseEligible?: boolean;
+  isAvailabilityOptedIn?: boolean;
   lastDonationDate: string | null;
   distanceKm?: number;
   index?: number;
@@ -21,6 +23,8 @@ export function DonorCard({
   bloodType,
   address,
   isAvailable,
+  isBaseEligible = isAvailable,
+  isAvailabilityOptedIn = true,
   lastDonationDate,
   distanceKm,
   index = 0,
@@ -28,6 +32,7 @@ export function DonorCard({
   const lastDonationLabel = lastDonationDate
     ? new Date(lastDonationDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
     : "Never";
+  const statusLabel = isAvailable ? "Available" : isBaseEligible && !isAvailabilityOptedIn ? "Opted out" : "Cooldown";
 
   return (
     <motion.div
@@ -54,7 +59,7 @@ export function DonorCard({
         <div className="flex flex-col items-end gap-2">
           <BloodTypeBadge bloodType={bloodType} size="sm" />
           <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${isAvailable ? "bg-teal-100 text-[#0D9488]" : "bg-red-100 text-[#B91C1C]"}`}>
-            {isAvailable ? "Available" : "Paused"}
+            {statusLabel}
           </span>
         </div>
       </div>
