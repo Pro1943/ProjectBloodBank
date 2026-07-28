@@ -83,7 +83,11 @@ export default function HospitalCampsPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          startDate: new Date(formData.startDate).toISOString(),
+          endDate: new Date(formData.endDate).toISOString(),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);

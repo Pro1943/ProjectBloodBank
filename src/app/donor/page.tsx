@@ -21,6 +21,7 @@ export default async function DonorDashboardPage() {
   });
 
   await syncCampStatuses();
+  const now = new Date();
 
   const requests = await db.bloodRequest.findMany({
     where: { status: { in: ["OPEN", "PARTIALLY_FILLED"] } },
@@ -58,7 +59,7 @@ export default async function DonorDashboardPage() {
   const camps = await db.donationCamp.findMany({
     where: {
       status: { in: ["UPCOMING", "ACTIVE"] },
-      endDate: { gte: new Date() },
+      endDate: { gte: now },
     },
   });
 
@@ -67,7 +68,7 @@ export default async function DonorDashboardPage() {
 
   if (donor?.lastDonationDate) {
     daysSinceDonation = Math.floor(
-      (Date.now() - new Date(donor.lastDonationDate).getTime()) / (1000 * 60 * 60 * 24)
+      (now.getTime() - new Date(donor.lastDonationDate).getTime()) / (1000 * 60 * 60 * 24)
     );
     inCooldown = daysSinceDonation < COOLDOWN_DAYS;
   }

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { syncCampStatuses } from "@/lib/maintenance";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,6 +8,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await syncCampStatuses();
+
     const { id } = await params;
     const user = await currentUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

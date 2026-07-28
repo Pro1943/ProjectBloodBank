@@ -4,14 +4,15 @@ export function getEffectiveCampStatus(
   storedStatus: string,
   now: Date = new Date()
 ): { status: string; isPast: boolean } {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  const startTime = new Date(startDate).getTime();
+  const endTime = new Date(endDate).getTime();
+  const nowTime = now.getTime();
 
-  if (end < now) {
+  if (endTime < nowTime) {
     return { status: "COMPLETED", isPast: true };
   }
 
-  if (start <= now) {
+  if (startTime <= nowTime) {
     return { status: "ACTIVE", isPast: false };
   }
 

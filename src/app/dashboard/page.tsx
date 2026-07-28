@@ -14,6 +14,7 @@ export default async function HospitalDashboardPage() {
   if (!hospital) return null;
 
   await syncCampStatuses();
+  const now = new Date();
 
   const [requestCount, campCount, donorCount, criticalCount] = await Promise.all([
     db.bloodRequest.count({ where: { hospitalId: hospital.id, status: { in: ["OPEN", "PARTIALLY_FILLED"] } } }),
@@ -21,7 +22,7 @@ export default async function HospitalDashboardPage() {
       where: {
         hospitalId: hospital.id,
         status: { in: ["UPCOMING", "ACTIVE"] },
-        endDate: { gte: new Date() },
+        endDate: { gte: now },
       },
     }),
     db.donor.count({ where: { hospitalAffiliationId: hospital.id } }),

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { LandingContent } from "@/components/landing-content";
+import { syncCampStatuses } from "@/lib/maintenance";
 
 const features = [
   {
@@ -32,6 +33,8 @@ export default async function HomePage() {
     if (donor) return redirect("/donor");
     return redirect("/onboarding");
   }
+
+  await syncCampStatuses();
 
   const donorCount = await db.donor.count();
   const requestCount = await db.bloodRequest.count({ where: { status: "FULFILLED" } });

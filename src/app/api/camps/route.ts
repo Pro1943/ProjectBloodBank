@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { syncCampStatuses } from "@/lib/maintenance";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { getEffectiveCampStatus } from "@/lib/camp-status";
 
 type CampItem = {
   id: string;
@@ -21,9 +22,31 @@ type CampItem = {
   rsvps: { status: string }[];
 };
 
-export async function GET(request: Request) {
+const TIMEZONE_OFFSET_PATTERN = /(?:Z|[+-]\d{2}:?\d{2})$/i;
+
+function parseAbsoluteDate(value: unknown): Date | null {
+  if (typeof value !== "string" || !TIMEZONE_OFFSET_PATTERN.test(value)) {
+    return null;
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function serializeCamp(camp: CampItem, now: Date) {
+  const { status } = getEffectiveCampStatus(camp.startDate, camp.endDate, camp.status, now);
+
+  return {
+    ...camp,
+    status,
+    rsvpCount: camp.rsvps.length,
+  };
+}
+
+export async function GET() {
   try {
     await syncCampStatuses();
+    const now = new Date();
 
     const user = await currentUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -40,10 +63,7 @@ export async function GET(request: Request) {
       }) as unknown as CampItem[];
 
       return NextResponse.json(
-        camps.map((camp: CampItem) => ({
-          ...camp,
-          rsvpCount: camp.rsvps.length,
-        }))
+        camps.map((camp: CampItem) => serializeCamp(camp, now))
       );
     }
 
@@ -61,7 +81,7 @@ export async function GET(request: Request) {
     const camps = await db.donationCamp.findMany({
       where: {
         status: { in: ["UPCOMING", "ACTIVE"] },
-        endDate: { gte: new Date() },
+        endDate: { gte: now },
       },
       orderBy: { startDate: "asc" },
       include: { rsvps: { where: { status: "CONFIRMED" } } },
@@ -79,8 +99,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(
       camps.map((camp: CampItem) => ({
-        ...camp,
-        rsvpCount: camp.rsvps.length,
+        ...serializeCamp(camp, now),
         isRegistered: registeredCampIds.has(camp.id),
       }))
     );
@@ -118,13 +137,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const startDate = new Date(body.startDate);
-    const endDate = new Date(body.endDate);
+    const startDate = parseAbsoluteDate(body.startDate);
+    const endDate = parseAbsoluteDate(body.endDate);
     const maxCapacity = parseInt(body.maxCapacity, 10);
 
-    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+    if (!startDate || !endDate) {
       return NextResponse.json(
-        { error: "Start date and end date must be valid date/time values." },
+        { error: "Start date and end date must be valid ISO date/time values with timezone information." },
         { status: 400 }
       );
     }

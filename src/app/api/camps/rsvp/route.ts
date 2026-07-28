@@ -1,9 +1,13 @@
 import { db } from "@/lib/db";
+import { getEffectiveCampStatus } from "@/lib/camp-status";
+import { syncCampStatuses } from "@/lib/maintenance";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
+    await syncCampStatuses();
+
     const user = await currentUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -19,7 +23,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Camp not found" }, { status: 404 });
     }
 
-    if (camp.status === "COMPLETED") {
+    const { status } = getEffectiveCampStatus(camp.startDate, camp.endDate, camp.status);
+
+    if (status === "COMPLETED") {
       return NextResponse.json({ error: "Cannot register for a completed camp" }, { status: 400 });
     }
 
