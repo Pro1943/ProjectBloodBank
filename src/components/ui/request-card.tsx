@@ -19,6 +19,7 @@ type RequestCardProps = {
   index?: number;
   isExpanded?: boolean;
   onExpandToggle?: () => void;
+  onCardClick?: () => void;
   expandedContent?: ReactNode;
 };
 
@@ -52,6 +53,7 @@ export function RequestCard({
   index = 0,
   isExpanded,
   onExpandToggle,
+  onCardClick,
   expandedContent,
 }: RequestCardProps) {
   const styles = urgencyCardStyles[urgency];
@@ -64,7 +66,8 @@ export function RequestCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
       whileHover={!isFulfilled ? { y: -1, transition: { duration: 0.15 } } : {}}
-      className={`overflow-hidden rounded-xl border shadow-sm ${styles.border} ${styles.bg}`}
+      onClick={onCardClick}
+      className={`overflow-hidden rounded-xl border shadow-sm ${styles.border} ${styles.bg} ${onCardClick ? "cursor-pointer" : ""}`}
     >
       <div className="flex">
         <div className={`w-1 shrink-0 ${styles.leftBar}`} />

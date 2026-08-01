@@ -20,7 +20,7 @@ type BloodRequest = {
   hospital: { id: string; name: string; email: string; phone: string; address: string; latitude: number; longitude: number };
 };
 
-type ContactInfo = { hospitalName: string; email: string; phone: string } | null;
+type ContactInfo = { hospitalName: string; address: string; email: string; phone: string } | null;
 
 export default function DonorRequestsPage() {
   const [nearbyRequests, setNearbyRequests] = useState<BloodRequest[]>([]);
@@ -95,20 +95,14 @@ export default function DonorRequestsPage() {
               hospitalName={request.hospital.name}
               createdAt={request.createdAt}
               index={i}
-              expandedContent={
-                (
-                  <div>
-                    <p className="text-sm text-[#64748B] mb-3">{request.hospital.address}</p>
-                    <button
-                      onClick={() => setContactInfo({ hospitalName: request.hospital.name, email: request.hospital.email, phone: request.hospital.phone })}
-                      className="rounded-lg bg-[#0369A1] px-4 py-2 text-sm font-semibold text-white hover:bg-[#075985]"
-                    >
-                      Contact hospital →
-                    </button>
-                  </div>
-                )
+              onCardClick={() =>
+                setContactInfo({
+                  hospitalName: request.hospital.name,
+                  address: request.hospital.address,
+                  email: request.hospital.email,
+                  phone: request.hospital.phone,
+                })
               }
-              onExpandToggle={() => {}}
             />
           ))}
         </div>
@@ -118,6 +112,7 @@ export default function DonorRequestsPage() {
         {contactInfo && (
           <div className="space-y-4">
             <p className="font-semibold text-[#0F172A]">{contactInfo.hospitalName}</p>
+            <p className="text-sm text-[#64748B] break-words">{contactInfo.address}</p>
             <div className="space-y-3 border-t border-[#E2E8F0] pt-4">
               <div>
                 <p className="text-xs font-semibold uppercase text-[#94A3B8] mb-1">Email</p>
