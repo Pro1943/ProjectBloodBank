@@ -1,21 +1,23 @@
-<![CDATA[<div align="center">
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Prisma_7-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Clerk-6C47FF?style=for-the-badge&logo=clerk&logoColor=white" alt="Clerk" />
+  <img src="https://img.shields.io/badge/Tailwind_v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
+</p>
 
-# 🩸 Project BloodBank
+<h1 align="center">🩸 Project BloodBank</h1>
 
-**Emergency blood coordination between hospitals and donors — built to save time when seconds matter.**
+<p align="center">
+  <strong>Emergency blood coordination between hospitals and donors — built to save time when seconds matter.</strong>
+</p>
 
-[![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Prisma](https://img.shields.io/badge/Prisma_7-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Clerk](https://img.shields.io/badge/Clerk-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)](https://clerk.com/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-[![Made by Pro1943](https://img.shields.io/badge/Made%20by-Pro1943-B91C1C?style=flat-square)](https://github.com/Pro1943)
-
-</div>
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT" /></a>
+  <a href="https://github.com/Pro1943"><img src="https://img.shields.io/badge/Made%20by-Pro1943-B91C1C?style=flat-square" alt="Made by Pro1943" /></a>
+</p>
 
 ---
 
@@ -41,23 +43,31 @@ Project BloodBank is a purpose-built coordination platform that connects hospita
 
 ### Hero
 
-![Landing page](images/lander.png)
+<p align="center">
+  <img src="images/lander.png" alt="Landing page" width="700" />
+</p>
 
 ### 🏥 Hospital Workspace
 
-| Dashboard | Blood Requests | Donor Management |
-|:---------:|:--------------:|:----------------:|
-| ![Hospital Dashboard](images/hospital_dashboard.png) | ![Hospital Requests](images/hospital_requests.png) | ![Donor Management](images/hospital_donner-manegment.png) |
+<p align="center">
+  <img src="images/hospital_dashboard.png" alt="Hospital Dashboard" width="420" />
+  &nbsp;&nbsp;
+  <img src="images/hospital_requests.png" alt="Hospital Requests" width="420" />
+</p>
 
-| Donation Camps |
-|:--------------:|
-| ![Hospital Camps](images/hospital_camp.png) |
+<p align="center">
+  <img src="images/hospital_donner-manegment.png" alt="Donor Management" width="420" />
+  &nbsp;&nbsp;
+  <img src="images/hospital_camp.png" alt="Donation Camps" width="420" />
+</p>
 
 ### 🩸 Donor Workspace
 
-| Dashboard | Nearby Blood Requests |
-|:---------:|:---------------------:|
-| ![Donor Dashboard](images/donner_dashboard.png) | ![Donor Blood Requests](images/donner_blood-requests.png) |
+<p align="center">
+  <img src="images/donner_dashboard.png" alt="Donor Dashboard" width="420" />
+  &nbsp;&nbsp;
+  <img src="images/donner_blood-requests.png" alt="Donor Blood Requests" width="420" />
+</p>
 
 ---
 
@@ -105,19 +115,19 @@ Project BloodBank is a purpose-built coordination platform that connects hospita
 
 ```mermaid
 flowchart TD
-    A["🏥 Hospital creates<br/>blood request"] --> B["System stores request<br/>(type, units, urgency)"]
-    B --> C{"Donor opens<br/>nearby requests"}
-    C --> D["Fetch all OPEN /<br/>PARTIALLY_FILLED requests"]
-    D --> E["Haversine filter:<br/>≤ 50 km from donor"]
-    E --> F["Compatibility filter:<br/>donor type → recipient type"]
-    F --> G["Sort by distance<br/>(closest first)"]
-    G --> H["Donor sees matched<br/>requests with hospital contact"]
-    H --> I{"Donor contacts<br/>hospital directly"}
-    I --> J["Hospital records<br/>contribution + units"]
-    J --> K{"unitsFulfilled ≥<br/>unitsNeeded?"}
+    A["🏥 Hospital creates\nblood request"] --> B["System stores request\n(type, units, urgency)"]
+    B --> C{"Donor opens\nnearby requests"}
+    C --> D["Fetch all OPEN /\nPARTIALLY_FILLED requests"]
+    D --> E["Haversine filter:\n≤ 50 km from donor"]
+    E --> F["Compatibility filter:\ndonor type → recipient type"]
+    F --> G["Sort by distance\n(closest first)"]
+    G --> H["Donor sees matched\nrequests with hospital contact"]
+    H --> I{"Donor contacts\nhospital directly"}
+    I --> J["Hospital records\ncontribution + units"]
+    J --> K{"unitsFulfilled ≥\nunitsNeeded?"}
     K -- Yes --> L["Status → FULFILLED"]
     K -- No --> M["Status → PARTIALLY_FILLED"]
-    J --> N["Donor's lastDonationDate<br/>updated → 56-day cooldown starts"]
+    J --> N["Donor lastDonationDate\nupdated — 56-day cooldown starts"]
 
     style A fill:#FEF2F2,stroke:#B91C1C,color:#0F172A
     style L fill:#F0FDF4,stroke:#0D9488,color:#0F172A
@@ -129,16 +139,16 @@ flowchart TD
 ```mermaid
 flowchart TD
     A["User visits /"] --> B{"Authenticated?"}
-    B -- No --> C["Landing page<br/>(public stats, sign-in/up)"]
+    B -- No --> C["Landing page\n(public stats, sign-in/up)"]
     B -- Yes --> D{"Lookup in DB"}
-    D --> E{"Hospital record<br/>exists?"}
-    E -- Yes --> F["→ /dashboard<br/>(Hospital workspace)"]
-    E -- No --> G{"Donor record<br/>exists?"}
-    G -- Yes --> H["→ /donor<br/>(Donor workspace)"]
-    G -- No --> I["→ /onboarding<br/>(Role selection)"]
+    D --> E{"Hospital record\nexists?"}
+    E -- Yes --> F["/dashboard\n(Hospital workspace)"]
+    E -- No --> G{"Donor record\nexists?"}
+    G -- Yes --> H["/donor\n(Donor workspace)"]
+    G -- No --> I["/onboarding\n(Role selection)"]
     I --> J{"User picks role"}
-    J -- Hospital --> K["Hospital profile form<br/>(name, address, coords, contact)"]
-    J -- Donor --> L["Donor profile form<br/>(name, blood type, coords, contact)"]
+    J -- Hospital --> K["Hospital profile form\n(name, address, coords, contact)"]
+    J -- Donor --> L["Donor profile form\n(name, blood type, coords, contact)"]
     K --> F
     L --> H
 
@@ -212,10 +222,9 @@ cd ProjectBloodBank
 
 # Install dependencies
 npm install
-
-# Configure environment variables
-# Create a .env file with the following keys:
 ```
+
+Create a `.env` file in the root with these keys:
 
 | Variable | Description |
 |----------|-------------|
@@ -243,42 +252,47 @@ The app will be running at `http://localhost:3000`.
 ```
 project_blood_bank/
 ├── prisma/
-│   ├── schema.prisma          # Data models: Hospital, Donor, BloodRequest, DonationCamp, CampRSVP, BloodDonorContribution
+│   ├── schema.prisma          # Data models: Hospital, Donor, BloodRequest,
+│   │                          #   DonationCamp, CampRSVP, BloodDonorContribution
 │   └── seed.ts                # Sample data seeder
 ├── prisma.config.ts           # Prisma driver adapter config (DATABASE_URL binding)
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx           # Landing page (public) with auto-redirect for authenticated users
+│   │   ├── page.tsx           # Landing page with auto-redirect for authenticated users
 │   │   ├── layout.tsx         # Root layout — ClerkProvider, Inter font, global styles
 │   │   ├── sign-in/           # Clerk sign-in page
 │   │   ├── sign-up/           # Clerk sign-up page
 │   │   ├── onboarding/        # Role selection → profile form (hospital or donor)
-│   │   ├── dashboard/         # Hospital workspace: dashboard, requests, camps, donors, profile
-│   │   ├── donor/             # Donor workspace: dashboard, nearby requests, camps, profile
+│   │   ├── dashboard/         # Hospital workspace: dashboard, requests, camps,
+│   │   │                      #   donors, profile
+│   │   ├── donor/             # Donor workspace: dashboard, nearby requests,
+│   │   │                      #   camps, profile
 │   │   └── api/
-│   │       ├── requests/      # CRUD for blood requests + nearby matching + contributions
+│   │       ├── requests/      # CRUD for blood requests + nearby matching
+│   │       │                  #   + contributions
 │   │       ├── camps/         # CRUD for donation camps + RSVP
 │   │       ├── donors/        # Donor listing and profile
 │   │       ├── hospital/      # Hospital-specific donor queries
 │   │       ├── hospitals/     # Hospital profile and listing
 │   │       └── maintenance/   # Automated cleanup of stale data
 │   ├── components/
-│   │   ├── app-shell.tsx      # Shared layout shell with role-aware sidebar navigation
+│   │   ├── app-shell.tsx      # Shared layout shell with role-aware sidebar
 │   │   ├── header-client.tsx  # Client-side header with Clerk user button
-│   │   ├── landing-content.tsx# Animated landing page content (stats, features)
-│   │   └── ui/               # Reusable components: RequestCard, CampCard, DonorCard,
-│   │                         #   BloodTypeBadge, UrgencyBadge, CooldownIndicator, etc.
+│   │   ├── landing-content.tsx# Animated landing page content
+│   │   └── ui/               # Reusable components: RequestCard, CampCard,
+│   │                          #   DonorCard, BloodTypeBadge, UrgencyBadge,
+│   │                          #   CooldownIndicator, Modal, etc.
 │   ├── lib/
-│   │   ├── auth.ts            # Role checking utilities (getUserRole, checkUserRole)
+│   │   ├── auth.ts            # Role checking utilities
 │   │   ├── availability.ts    # 56-day cooldown + opt-in availability logic
 │   │   ├── blood-compatibility.ts  # ABO/Rh compatibility matrix
-│   │   ├── camp-status.ts     # Effective camp status computation from date window
-│   │   ├── countries.ts       # Country code list for phone number input
-│   │   ├── db.ts              # Prisma client with pg driver adapter + SSL config
+│   │   ├── camp-status.ts     # Effective camp status from date window
+│   │   ├── countries.ts       # Country code list for phone input
+│   │   ├── db.ts              # Prisma client with pg driver adapter + SSL
 │   │   ├── distance.ts        # Haversine formula for coordinate distance
-│   │   └── maintenance.ts     # Auto-sync camp statuses + cleanup old completed data
-│   └── proxy.ts               # Clerk middleware — protects /dashboard, /donor, /onboarding
-└── images/                    # Screenshots for README
+│   │   └── maintenance.ts     # Auto-sync camp statuses + cleanup old data
+│   └── proxy.ts               # Clerk middleware — route protection
+└── images/                    # Screenshots
 ```
 
 ---
@@ -309,9 +323,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-<div align="center">
-
-Built by [@Pro1943](https://github.com/Pro1943)
-
-</div>
-]]>
+<p align="center">Built by <a href="https://github.com/Pro1943">@Pro1943</a></p>
