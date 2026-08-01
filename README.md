@@ -1,3 +1,12 @@
+<h1 align="center">🩸 Project BloodBank</h1>
+
+<p align="center">
+  <strong>"When minutes matter,
+coordination saves lives."</strong>
+</p>
+
+---
+
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
@@ -6,12 +15,6 @@
   <img src="https://img.shields.io/badge/Clerk-6C47FF?style=for-the-badge&logo=clerk&logoColor=white" alt="Clerk" />
   <img src="https://img.shields.io/badge/Tailwind_v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
-</p>
-
-<h1 align="center">🩸 Project BloodBank</h1>
-
-<p align="center">
-  <strong>Emergency blood coordination between hospitals and donors — built to save time when seconds matter.</strong>
 </p>
 
 <p align="center">
