@@ -41,33 +41,49 @@ Project BloodBank is a purpose-built coordination platform that connects hospita
 
 ## 📸 Screenshots
 
-### Hero
-
 <p align="center">
-  <img src="images/lander.png" alt="Landing page" width="700" />
+  <img src="images/lander.png" alt="Landing Page" width="800" />
 </p>
 
 ### 🏥 Hospital Workspace
 
-<p align="center">
-  <img src="images/hospital_dashboard.png" alt="Hospital Dashboard" width="420" />
-  &nbsp;&nbsp;
-  <img src="images/hospital_requests.png" alt="Hospital Requests" width="420" />
-</p>
-
-<p align="center">
-  <img src="images/hospital_donner-manegment.png" alt="Donor Management" width="420" />
-  &nbsp;&nbsp;
-  <img src="images/hospital_camp.png" alt="Donation Camps" width="420" />
-</p>
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="images/hospital_dashboard.png" alt="Hospital Dashboard" width="100%" />
+      <br /><strong>Dashboard</strong> — operational overview with live stats
+    </td>
+    <td width="50%" align="center">
+      <img src="images/hospital_requests.png" alt="Hospital Blood Requests" width="100%" />
+      <br /><strong>Blood Requests</strong> — create and track urgent needs
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="images/hospital_donner-manegment.png" alt="Donor Management" width="100%" />
+      <br /><strong>Donor Management</strong> — affiliated donors and eligibility
+    </td>
+    <td width="50%" align="center">
+      <img src="images/hospital_camp.png" alt="Donation Camps" width="100%" />
+      <br /><strong>Donation Camps</strong> — schedule drives with RSVP tracking
+    </td>
+  </tr>
+</table>
 
 ### 🩸 Donor Workspace
 
-<p align="center">
-  <img src="images/donner_dashboard.png" alt="Donor Dashboard" width="420" />
-  &nbsp;&nbsp;
-  <img src="images/donner_blood-requests.png" alt="Donor Blood Requests" width="420" />
-</p>
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="images/donner_dashboard.png" alt="Donor Dashboard" width="100%" />
+      <br /><strong>Dashboard</strong> — cooldown status and compatible request count
+    </td>
+    <td width="50%" align="center">
+      <img src="images/donner_blood-requests.png" alt="Nearby Blood Requests" width="100%" />
+      <br /><strong>Nearby Requests</strong> — matched by blood type and proximity
+    </td>
+  </tr>
+</table>
 
 ---
 
