@@ -40,6 +40,8 @@ Project BloodBank is a purpose-built coordination platform that connects hospita
 
 **[→ project-blood-bank-plum.vercel.app](https://project-blood-bank-plum.vercel.app/)**
 
+## Youtube Showcase
+[Youtube](https://youtu.be/qQUuG9kem08)
 ---
 
 ## 📸 Screenshots
